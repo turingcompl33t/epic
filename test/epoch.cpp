@@ -22,22 +22,20 @@ TEST_CASE("epic::epoch")
 
     SECTION("supports pinned() and unpinned() operations")
     {
-        auto e1 = epoch::starting();
-        REQUIRE_FALSE(epoch::is_pinned(std::move(e1)));
+        auto e = epoch::starting();
+        REQUIRE_FALSE(e.is_pinned());
 
-        auto e2 = epoch::starting();
-        auto p = epoch::pinned(std::move(e2));
-        REQUIRE(epoch::is_pinned(std::move(p)));
+        auto p = e.pinned();
+        REQUIRE(p.is_pinned());
 
-        auto e3 = epoch::starting();
-        auto u = epoch::unpinned(std::move(e3));
-        REQUIRE_FALSE(epoch::is_pinned(std::move(u)));
+        auto u = p.unpinned();
+        REQUIRE_FALSE(u.is_pinned());
     }
 
     SECTION("has wrapping addition / subtraction semantics")
     {
         auto e1 = epoch::with_value(USIZE_MAX - 1);
-        auto e2 = epoch::successor(std::move(e1));
+        auto e2 = e1.successor();
 
         REQUIRE(e2.get() == 0);
 
@@ -45,7 +43,7 @@ TEST_CASE("epic::epoch")
         auto e4 = epoch::starting();
 
         // compute the number of epochs e3 is ahead of e4
-        auto r = epoch::wrapping_sub(std::move(e3), std::move(e4));
+        auto r = e3.wrapping_sub(e4);
         
         // recall: successor epoch is 2 ahead of the current epoch
         // in terms of the internal representation
@@ -60,7 +58,7 @@ TEST_CASE("epic::atomic_epoch")
     SECTION("can be created from an existing epoch")
     {
         auto e = epoch::starting();
-        auto a = atomic_epoch::make(std::move(e));
+        auto a = atomic_epoch::make(e);
 
         auto l = a.load(std::memory_order_acquire);
         REQUIRE(l.get() == 0);
@@ -69,10 +67,10 @@ TEST_CASE("epic::atomic_epoch")
     SECTION("supports store() operations from an existing epoch")
     {
         auto e = epoch::starting();
-        auto a = atomic_epoch::make(std::move(e));
+        auto a = atomic_epoch::make(e);
 
         auto s = epoch::with_value(128);
-        a.store(std::move(s), std::memory_order_release);
+        a.store(s, std::memory_order_release);
 
         auto l = a.load(std::memory_order_acquire);
         REQUIRE(l.get() == 128);

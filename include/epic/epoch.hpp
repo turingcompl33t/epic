@@ -58,45 +58,45 @@ namespace epic
         }
 
         // epoch::wrapping_sub()
-        // Returns the number of epochs `a` is ahead of `b`.
+        // Returns the number of epochs `this` is ahead of `other`.
         //
         // Internally, epochs are represented as numbers in the range 
         // (ISIZE_MIN / 2) .. (ISIZE_MAX / 2), so the returned distance
         // will also be within this interval.
-        static auto wrapping_sub(epoch&& a, epoch&& b) -> isize_t
+        auto wrapping_sub(epoch const& other) -> isize_t
         {
-            auto const masked = (b.data & ~1ul);
-            return static_cast<isize_t>(a.data - masked) >> 1;
+            auto const masked = (other.data & ~1ul);
+            return static_cast<isize_t>(this->data - masked) >> 1;
         }
 
         // epoch::is_pinned()
         // Return `true` if the epoch is marked as pinned.
-        __always_inline static auto is_pinned(epoch&& e) -> bool
+        __always_inline auto is_pinned() -> bool
         {
-            return (e.data & 1ul) == 1;
+            return (this->data & 1ul) == 1;
         }
         
         // epoch::pinned()
         // Returns the same epoch, but marked as pinned.
-        __always_inline static auto pinned(epoch&& e) -> epoch
+        __always_inline auto pinned() -> epoch
         {
-            return epoch{ e.data | 1ul };
+            return epoch{ this->data | 1ul };
         }
 
         // epoch::unpinned()
         // Returns the same epoch, but marked as unpinned.
-        __always_inline static auto unpinned(epoch&& e) -> epoch
+        __always_inline auto unpinned() -> epoch
         {
-            return epoch{ e.data & ~1ul };
+            return epoch{ this->data & ~1ul };
         }
 
         // epoch::successor()
         // Returns the successor epoch.
         // 
         // Successor epoch marked as pinned iff the previous was as well.
-        __always_inline static auto successor(epoch&& e) -> epoch
+        __always_inline auto successor() -> epoch
         {
-            return epoch{ e.data + 2 };
+            return epoch{ this->data + 2 };
         }   
 
         // epoch::get()
@@ -127,7 +127,7 @@ namespace epic
 
         // atomic_epoch::make()
         // Create a new atomic epoch.
-        __always_inline static auto make(epoch&& e) -> atomic_epoch
+        __always_inline static auto make(epoch const& e) -> atomic_epoch
         {
             return atomic_epoch{ e.get() };
         }
@@ -142,7 +142,7 @@ namespace epic
 
         // atomic_epoch::store()
         // Stores a value into the atomic epoch.
-        __always_inline auto store(epoch&& e, std::memory_order order) -> void
+        __always_inline auto store(epoch const& e, std::memory_order order) -> void
         {
             std::atomic_store_explicit(&this->data, e.get(), order);
         }
@@ -152,7 +152,10 @@ namespace epic
         //
         // The return value is always the previous value. If it is equal to
         // `current`, then the value is updated.
-        __always_inline auto compare_and_swap(epoch&& current, epoch&& next, std::memory_order order) -> epoch
+        __always_inline auto compare_and_swap(
+            epoch const& current, 
+            epoch const& next, 
+            std::memory_order order) -> epoch
         {
             auto prev = current.get();
             std::atomic_compare_exchange_strong_explicit(

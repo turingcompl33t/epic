@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <optional>
 
+#include "epoch.hpp"
 #include "deferred.hpp"
 
 // the maxmimum number of objects a bag may contain
@@ -17,10 +18,13 @@ static auto no_op() -> void {}
 
 namespace epic
 {
+    class bag;
+
     // A static bag and the associated epoch.
     class sealed_bag
     {
-        
+        epoch epoch_;
+        std::unique_ptr<bag> bag_;
     };
 
     // A bag of deferred functions.
