@@ -26,23 +26,24 @@ namespace epic
     public:
         owned() = delete;
 
-        // impl drop for owned
         ~owned()
         {
             auto const [r, t] = decompose_tag<T>(this->data);
             pointable<T>::drop(r);
         }
 
+        // The type owned<T> is non-copyable; in order to make a 
+        // deep copy of an owned<T>, use owned::clone()
         owned(owned const&)            = delete;
         owned& operator=(owned const&) = delete;
 
         owned(owned&&)            = delete;
         owned& operator=(owned&&) = delete;
 
-        // owned::create()
+        // owned::make()
         // Construct the specified type on the heap and returns a new owned pointer to it.
         template <typename... Args>
-        static auto create(Args&&... args) -> owned<T>
+        static auto make(Args&&... args) -> owned<T>
         {
             return owned::from_usize(pointable<T>::init(std::forward<Args>(args)...));
         }
@@ -62,8 +63,8 @@ namespace epic
         // IMPT: this operation consumes the owned<T> instance.
         auto into_unique() -> std::unique_ptr<T>
         {
-            auto const [raw, tag] = decompose_tag<T>(this->data);
-            return std::unique_ptr<T>{reinterpret_cast<T*>(raw)};
+            auto const [r, t] = decompose_tag<T>(this->data);
+            return std::unique_ptr<T>{reinterpret_cast<T*>(r)};
         }
 
         // owned::from_unique()
@@ -85,8 +86,6 @@ namespace epic
         // Converts and returns owned pointer as usize (size_t).
         //
         // IMPT: this operation consumes the owned<T> instance.
-        //
-        // Trait: owned<T> implements Pointer<T>
         auto into_usize() -> size_t
         {
             auto const d = this->data;
@@ -95,8 +94,6 @@ namespace epic
 
         // owned::from_usize()
         // Construct a new owned<T> from given usize (size_t).
-        //
-        // Trait: owned<T> implements Pointer<T>
         static inline auto from_usize(size_t data) -> owned<T>
         {
             assert(0 != data);
@@ -123,51 +120,48 @@ namespace epic
         // owned::clone()
         // Clones the owned instance.
         //
-        // IMPT: value pointed to by owned pointer must implement clone().
-        // auto clone() -> owned<T>
-        // {
+        // IMPT: value pointed to by owned pointer must implmenet copy constructor.
+        //
+        // TODO: constrain via concept? std::enable_if?
+        auto clone() -> owned<T>
+        {
+            auto& tmp = this->deref_mut();
+            return owned<T>::make(tmp);
+        }
 
-        // }
+        auto operator*() -> T&
+        {
+            return this->deref();
+        }
 
-        // owned::deref
-        // 
-        // Trait:: owned<T> implements Deref<T>
+        auto operator->() -> T*
+        {
+            return &this->deref();
+        }
+
+    private:
+        owned(size_t init) : data{init} {}
+
         auto deref() -> T&
         {   
             auto const [r, t] = decompose_tag<T>(this->data);
             return pointable<T>::deref(r);
         }
 
-        // owned::deref_mut()
-        // 
-        // Trait: owned<T> implements DerefMut<T>
-        auto deref_mut() -> T&
+        auto deref_mut() -> T const&
         {
             auto const [r, t] = decompose_tag<T>(this->data);
-            return pointable<T>::deref_mut(r);
+            return pointable<T>::deref(r);
         }
-
-        // owned::as_ref()
-        // Return a reference to the owned value.
-        //
-        // Trait: owned<T> implements AsRef<T>
-        auto as_ref() -> T&
-        {
-            return this->deref();
-        }
-
-        // owned::as_mut()
-        // Return a reference to the owned value.
-        //
-        // Trait: owned<T> implements AsMut<T>
-        auto as_mut() -> T&
-        {
-            return this->deref_mut();
-        }
-
-    private:
-        owned(size_t init) : data{init} {}
     };
+
+    // epic::make_owned()
+    // Factory function.
+    template <typename T, typename... Args>
+    auto make_owned(Args&&... args) -> owned<T>
+    {
+        return owned<T>::make(std::forward<Args>(args)...);
+    }
 }
 
 #endif
