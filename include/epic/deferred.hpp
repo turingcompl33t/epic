@@ -18,6 +18,20 @@ namespace epic
         deferred()  = delete;
         ~deferred() = default;
 
+        deferred(deferred const&)            = delete;
+        deferred& operator=(deferred const&) = delete;
+
+        deferred(deferred&& d) : fn{std::move(d.fn)} {}
+        deferred& operator=(deferred&& d)
+        {
+            if (&d != this)
+            {
+                this->fn = std::move(d.fn);
+            }
+
+            return *this;
+        }
+
         static auto make(std::function<void()>&& f) -> deferred
         {
             return deferred{std::move(f)};
