@@ -18,10 +18,7 @@ namespace epic
         size_t data;
 
     public:
-        shared() = delete;
-
-        // NOTE: the shared instance does not own the pointee, and
-        // thus does not attempt to destroy it on drop
+        shared()  = delete;
         ~shared() = default;
 
         shared(shared const& s) 
