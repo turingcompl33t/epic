@@ -3,6 +3,7 @@
 #ifndef EPIC_POINTER_H
 #define EPIC_POINTER_H
 
+#include <memory>
 #include <cstddef>
 
 namespace epic
@@ -31,7 +32,7 @@ namespace epic
 
         // pointable::deref()
         // Returns a reference to the pointed-to value.
-        static auto deref(size_t ptr) -> T&
+        static auto deref(size_t ptr) -> T const&
         {
             auto p = reinterpret_cast<T*>(ptr);
             return *p;

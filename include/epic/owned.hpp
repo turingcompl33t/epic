@@ -8,10 +8,12 @@
 #include <cassert>
 
 #include "base.hpp"
-#include "shared.hpp"
 
 namespace epic
 {
+    template <typename T>
+    class shared;
+
     // An owned, heap-allocated object.
     //
     // Analogous to a std::unique_ptr<T>.
@@ -131,27 +133,27 @@ namespace epic
 
         auto operator*() -> T&
         {
-            return this->deref();
+            return this->deref_mut();
         }
 
         auto operator->() -> T*
         {
-            return &this->deref();
+            return &this->deref_mut();
         }
 
     private:
         owned(size_t init) : data{init} {}
 
-        auto deref() -> T&
+        auto deref() -> T const&
         {   
             auto const [r, t] = decompose_tag<T>(this->data);
             return pointable<T>::deref(r);
         }
 
-        auto deref_mut() -> T const&
+        auto deref_mut() -> T&
         {
             auto const [r, t] = decompose_tag<T>(this->data);
-            return pointable<T>::deref(r);
+            return pointable<T>::deref_mut(r);
         }
     };
 

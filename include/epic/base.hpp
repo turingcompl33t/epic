@@ -6,6 +6,7 @@
 #include <atomic>
 #include <tuple>
 #include <cstddef>
+#include <cassert>
 
 #include "pointer.hpp"
 
