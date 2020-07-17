@@ -17,6 +17,12 @@ static auto no_op() -> void {}
 
 namespace epic
 {
+    // A static bag and the associated epoch.
+    class sealed_bag
+    {
+        
+    };
+
     // A bag of deferred functions.
     class bag
     {
