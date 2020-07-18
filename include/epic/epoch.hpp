@@ -27,8 +27,13 @@ namespace epic
 
     public:
 
-        epoch(epoch const&)            = delete;
-        epoch& operator=(epoch const&) = delete;
+        epoch(epoch const& e) : data{e.data} {}
+
+        epoch& operator=(epoch const& e)
+        {
+            this->data = e.data;
+            return *this;
+        }
 
         epoch(epoch&& e) : data{e.data} {}
         
@@ -63,7 +68,7 @@ namespace epic
         // Internally, epochs are represented as numbers in the range 
         // (ISIZE_MIN / 2) .. (ISIZE_MAX / 2), so the returned distance
         // will also be within this interval.
-        auto wrapping_sub(epoch const& other) -> isize_t
+        auto wrapping_sub(epoch const& other) const -> isize_t
         {
             auto const masked = (other.data & ~1ul);
             return static_cast<isize_t>(this->data - masked) >> 1;
@@ -71,21 +76,21 @@ namespace epic
 
         // epoch::is_pinned()
         // Return `true` if the epoch is marked as pinned.
-        __always_inline auto is_pinned() -> bool
+        __always_inline auto is_pinned() const -> bool
         {
             return (this->data & 1ul) == 1;
         }
         
         // epoch::pinned()
         // Returns the same epoch, but marked as pinned.
-        __always_inline auto pinned() -> epoch
+        __always_inline auto pinned() const -> epoch
         {
             return epoch{ this->data | 1ul };
         }
 
         // epoch::unpinned()
         // Returns the same epoch, but marked as unpinned.
-        __always_inline auto unpinned() -> epoch
+        __always_inline auto unpinned() const -> epoch
         {
             return epoch{ this->data & ~1ul };
         }
@@ -94,7 +99,7 @@ namespace epic
         // Returns the successor epoch.
         // 
         // Successor epoch marked as pinned iff the previous was as well.
-        __always_inline auto successor() -> epoch
+        __always_inline auto successor() const -> epoch
         {
             return epoch{ this->data + 2 };
         }   
@@ -122,8 +127,20 @@ namespace epic
         atomic_epoch(atomic_epoch const&)            = delete;
         atomic_epoch& operator=(atomic_epoch const&) = delete;
 
-        atomic_epoch(atomic_epoch&&)            = delete;
-        atomic_epoch& operator=(atomic_epoch&&) = delete;
+        atomic_epoch(atomic_epoch&& e) 
+            : data{e.data.load(std::memory_order_acquire)}
+        {}
+
+        atomic_epoch& operator=(atomic_epoch&& e)
+        {
+            if (&e != this)
+            {
+                auto const val = e.data.load(std::memory_order_acquire);
+                this->data.store(val, std::memory_order_release);
+            }
+
+            return *this;
+        }
 
         // atomic_epoch::make()
         // Create a new atomic epoch.

@@ -38,8 +38,20 @@ namespace epic
         atomic(atomic const&)            = delete;
         atomic& operator=(atomic const&) = delete;
 
-        atomic(atomic&&)            = delete;
-        atomic& operator=(atomic&&) = delete;
+        atomic(atomic&& a) 
+            : data{a.data.load(std::memory_order_acquire)} {}
+        
+        atomic& operator=(atomic&& a)
+        {
+            if (&a != this)
+            {   
+                auto const val = a.data.load(std::memory_order_acquire);
+                this->data.store(val, std::memory_order_release);
+                a.data.store(0, std::memory_order_release);
+            }
+
+            return *this;
+        }
 
         // atomic::make()
         // Constructs a new pointee on the heap and returns a new atomic pointer to it.
