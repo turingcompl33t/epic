@@ -10,8 +10,8 @@
 
 #include "epoch.hpp"
 #include "deferred.hpp"
-#include "sync/queue.hpp"
-#include "sync/intrusive_list.hpp"
+#include "queue.hpp"
+#include "intrusive_list.hpp"
 
 // the maxmimum number of objects a bag may contain
 // TODO: make 64 in non-debug build

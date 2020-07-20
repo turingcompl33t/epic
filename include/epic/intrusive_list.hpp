@@ -25,7 +25,7 @@ namespace epic
             : next{std::move(atomic<list_entry>::null())} 
         {}
 
-        list_entry(list_entry const&) = delete;
+        list_entry(list_entry const&)            = delete;
         list_entry& operator=(list_entry const&) = delete;
 
         list_entry(list_entry&& other) 
@@ -49,7 +49,29 @@ namespace epic
         {
             this->next.fetch_or(1, std::memory_order_release, g);
         }
+    };
 
+    // intrusive_list_iter
+    //
+    // A custom iterator over an atomic, singly-linked list.
+    template <typename T>
+    class intrusive_list_iterator
+    {
+        // The guard that protects iteration.
+        guard& guard_;
+        
+        // Pointer to the predecessor of current entry.
+        atomic<list_entry> prev;
+
+        // The current entry.
+        shared<list_entry> curr;
+
+        // The list head, needed for restarting iteration.
+        atomic<list_entry> head;
+
+    public:
+        // TODO
+        intrusive_list_iterator() {}
     };
 
     // intrusive_list
@@ -61,6 +83,8 @@ namespace epic
         atomic<list_entry> head;
 
     public:
+        using iterator = intrusive_list_iterator<T>;
+
         // Default constructor initializes head with null pointer.
         intrusive_list() 
             : head{std::move(atomic<list_entry>::null())} 
@@ -94,6 +118,7 @@ namespace epic
 
         intrusive_list(intrusive_list&& other) 
             : head{std::move(other.head)}
+        {}
 
         intrusive_list& operator=(intrusive_list&& rhs)
         {
@@ -106,29 +131,28 @@ namespace epic
         }
 
         // intrusive_list::insert()
-        auto insert(shared<T> container, guard& g) 
+        // Insert the entry embedded in `container` into the list.
+        auto insert(shared<T>&& container, guard& g) -> void
         {
             // Insert right after head i.e. at beginning of list.
             auto& = this->head;
+
+            // TODO
             // Get the intrusively stored list_entry of the new element to insert.
             // Make a shared pointer to that entry
         }
-    };
 
-    template <typename T>
-    class list_iter
-    {
-        // The guard that protects iteration.
-        guard& guard_;
-        
-        // Pointer to the predecessor of current entry.
-        atomic<list_entry> prev;
+        auto begin() -> iterator
+        {
+            // TODO
+            return iterator{};
+        }
 
-        // The current entry.
-        shared<list_entry> curr;
-
-        // The list head, needed for restarting iteration.
-        atomic<list_entry> head;
+        auto end() -> iterator
+        {
+            // TODO
+            return iterator{};
+        }
     };
 }
 
