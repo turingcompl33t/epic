@@ -6,7 +6,7 @@
 #include "deferred.hpp"
 #include "internal.hpp"
 #include "collector.hpp"
-#include "optional_ref.hpp"
+#include "nullable_ref.hpp"
 
 namespace epic
 {   
@@ -170,11 +170,11 @@ namespace epic
 
         // guard::get_collector()
         // Returns the `collector` instance associated with this guard.
-        auto get_collector() -> optional_ref<collector>
+        auto get_collector() -> nullable_ref<collector>
         {
             return is_dummy() 
-                ? optional_ref<collector>{} 
-                : optional_ref<collector>{&this->l->get_collector()};
+                ? nullable_ref<collector>{} 
+                : nullable_ref<collector>{&this->l->get_collector()};
         }
 
         // guard::is_dummy()

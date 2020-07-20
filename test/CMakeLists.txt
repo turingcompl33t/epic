@@ -7,11 +7,12 @@ add_library(catch-main STATIC "catch_main.cpp")
 target_link_libraries(catch-main PUBLIC Catch2::Catch2)
 
 set(TEST_SUITE_SRC
-    "atomic.cpp"
+    #"atomic.cpp"
     "base.cpp"
     "cell.cpp"
     "epoch.cpp"
-    "internal.cpp"
+    #"internal.cpp"
+    "nullable_ref.cpp"
     "ordering.cpp"
     "owned.cpp"
     "pointer.cpp"

@@ -1,35 +1,38 @@
-// optional_ref.hpp
+// nullable_ref.hpp
 
-#ifndef EPIC_OPTIONAL_REF_H
-#define EPIC_OPTIONAL_REF_H
+#ifndef EPIC_NULLABLE_REF_H
+#define EPIC_NULLABLE_REF_H
 
 #include <stdexcept>
 
 namespace epic
 {   
-    // optional_ref
+    // nullable_ref
+    //
+    // A reference type thatis either a value reference
+    // to `T`, or null (not present).
     template <typename T>
-    class optional_ref
+    class nullable_ref
     {
         T* ptr;
 
     public:
-        optional_ref() : ptr{nullptr} {}
-        optional_ref(T* ptr_) : ptr{ptr_} {}
+        nullable_ref() : ptr{nullptr} {}
+        nullable_ref(T* ptr_) : ptr{ptr_} {}
 
-        optional_ref(optional_ref const& other) 
+        nullable_ref(nullable_ref const& other) 
             : ptr{other.ptr} {}
 
-        optional_ref& operator=(optional_ref const& rhs)
+        nullable_ref& operator=(nullable_ref const& rhs)
         {
             this->ptr = rhs.ptr;
             return *this;
         }
 
-        optional_ref(optional_ref&& other) 
+        nullable_ref(nullable_ref&& other) 
             : ptr{other.ptr} {}
 
-        optional_ref& operator=(optional_ref&& rhs)
+        nullable_ref& operator=(nullable_ref&& rhs)
         {
             if (&rhs != this)
             {
@@ -43,13 +46,13 @@ namespace epic
         {
             if (nullptr == ptr)
             {
-                throw std::runtime_error{"attempt to dereference invalid optional_ref"};
+                throw std::runtime_error{"attempt to dereference invalid nullable_ref"};
             }
 
             return *(this->ptr);
         }
 
-        explicit auto operator bool() -> bool
+        explicit operator bool()
         {
             return ptr != nullptr;
         }
