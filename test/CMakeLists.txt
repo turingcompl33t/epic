@@ -9,6 +9,7 @@ target_link_libraries(catch-main PUBLIC Catch2::Catch2)
 set(TEST_SUITE_SRC
     "atomic.cpp"
     "base.cpp"
+    "cell.cpp"
     "epoch.cpp"
     "internal.cpp"
     "ordering.cpp"

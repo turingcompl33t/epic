@@ -6,6 +6,7 @@
 
 TEST_CASE("epic::bag")
 {
+    REQUIRE(true);
     using namespace epic;
 
     SECTION("supports default construction with bag::make()")
