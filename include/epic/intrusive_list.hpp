@@ -5,8 +5,8 @@
 
 #include <cassert>
 
-#include "../guard.hpp"
-#include "../atomic.hpp"
+#include "guard.hpp"
+#include "atomic.hpp"
 
 namespace epic
 {

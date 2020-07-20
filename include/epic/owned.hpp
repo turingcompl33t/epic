@@ -78,20 +78,24 @@ namespace epic
         // owned::into_shared()
         // Converts the pointer into an epic::shared.
         //
-        // IMPT: this operation consumes the owned<T> instance.
-        auto into_shared() -> shared<T>
+        // This operation consumes the owned<T> instance
+        // because, by definition, the caller is relinquishing
+        // exclusive ownership of the pointee. 
+        static auto into_shared(owned<T>&& o, guard& g) -> shared<T>
         {
-            return shared<T>::from_usize(this->into_usize());
+            const auto as_usize = owned<T>::into_usize(std::move(o));
+            return shared<T>::from_usize(as_usize);
         }
 
         // owned::into_usize()
         // Converts and returns owned pointer as usize (size_t).
         //
-        // IMPT: this operation consumes the owned<T> instance.
-        auto into_usize() -> size_t
+        // This operation consumes the owned<T> instance
+        // because, by definition, the caller is relinquishing
+        // exclusive ownership of the pointee.
+        static auto into_usize(owned<T>&& o) -> size_t
         {
-            auto const d = this->data;
-            return d;
+            return o.data;
         }
 
         // owned::from_usize()

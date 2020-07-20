@@ -6,6 +6,7 @@
 #include <cstddef>
 
 #include "base.hpp"
+#include "nullable_ref.hpp"
 
 namespace epic
 {
@@ -104,6 +105,22 @@ namespace epic
         {
             auto const [r, t] = decompose_tag<T>(this->data);
             return 0 == r;
+        }
+
+        // shared::as_ref()
+        auto as_ref() -> nullable_ref<T>
+        {
+            if (is_null())
+            {
+                // The instance currently contains an invalid pointer;
+                // return an invalid reference.
+                return nullable_ref{};
+            }
+            else
+            {
+                // Return a valid reference to the shared data.
+                return nullable_ref{this->as_raw()};
+            }
         }
 
         auto operator*() -> T&
