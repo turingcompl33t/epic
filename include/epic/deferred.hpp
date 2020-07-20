@@ -15,7 +15,9 @@ namespace epic
         std::function<void()> fn;
     
     public:
-        deferred()  = delete;
+        deferred(std::function<void()>&& f) 
+            : fn{std::move(f)} {}
+        
         ~deferred() = default;
 
         deferred(deferred const&)            = delete;
@@ -32,18 +34,12 @@ namespace epic
             return *this;
         }
 
-        static auto make(std::function<void()>&& f) -> deferred
-        {
-            return deferred{std::move(f)};
-        }
-
+        // deferred::call()
+        // Invoke the deferred function.
         auto call() -> void
         {
             fn();
         }
-
-    private:
-        deferred(std::function<void()>&& f) : fn{std::move(f)} {}
     };
 }
 

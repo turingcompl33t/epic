@@ -21,10 +21,10 @@ TEST_CASE("epic::bag")
 
         auto b = bag::make();
 
-        auto r1 = b->try_push(deferred::make([&]() mutable { ++x; }));
-        auto r2 = b->try_push(deferred::make([&]() mutable { ++x; }));
-        auto r3 = b->try_push(deferred::make([&]() mutable { ++x; }));
-        auto r4 = b->try_push(deferred::make([&]() mutable { ++x; }));
+        auto r1 = b->try_push(deferred{([&]() mutable { ++x; })});
+        auto r2 = b->try_push(deferred{([&]() mutable { ++x; })});
+        auto r3 = b->try_push(deferred{([&]() mutable { ++x; })});
+        auto r4 = b->try_push(deferred{([&]() mutable { ++x; })});
 
         REQUIRE_FALSE(r1.has_value());
         REQUIRE_FALSE(r2.has_value());
@@ -32,7 +32,7 @@ TEST_CASE("epic::bag")
         REQUIRE_FALSE(r4.has_value());
 
         // fifth push operation fails because bag is full
-        auto r5 = b->try_push(deferred::make([&]() mutable { ++x; }));
+        auto r5 = b->try_push(deferred{([&]() mutable { ++x; })});
 
         // the return value from try_push() is an optional containing 
         // the deferred function that could not be pushed into the bag 

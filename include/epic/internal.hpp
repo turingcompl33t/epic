@@ -186,16 +186,16 @@ namespace epic
 
     public:
 
-        // local::global()
+        // local::get_global()
         // Returns a reference to the `global` instance in which the `local` resides.
-        __always_inline auto global() const -> global&
+        __always_inline auto get_global() const -> global&
         {
             return this->instance.global_as_ref();
         }
 
-        // local::collector()
+        // local::get_collector()
         // Returns a reference to the `collector` instance in which this `local` resides.
-        __always_inline auto collector() const -> collector&
+        __always_inline auto get_collector() const -> collector&
         {
             return this->instance;
         }
@@ -205,6 +205,20 @@ namespace epic
         __always_inline auto is_pinned() const -> bool
         {
             return this->guard_count > 0;
+        }
+
+        // local::defer()
+        // Adds the deferred function `d` to the thread-local bag.
+        auto defer(deferred&& d, guard& g) const -> void
+        {
+            // TODO
+        }
+
+        // local::flush()
+        // TODO
+        auto flush(guard& g) const -> void
+        {
+            // TODO
         }
 
         // local::pin()
