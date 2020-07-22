@@ -3,13 +3,13 @@
 #ifndef EPIC_GUARD_H
 #define EPIC_GUARD_H
 
+#include "shared.hpp"
 #include "deferred.hpp"
-#include "internal.hpp"
-#include "collector.hpp"
-#include "nullable_ref.hpp"
 
 namespace epic
 {   
+    class local;
+
     // guard
     // 
     // A guard that keeps the current thread pinned.
@@ -33,17 +33,15 @@ namespace epic
     // `guard` falls out of scope.
     class guard
     {
-          local const* l;
+          local const* local_ptr;
         
     public:
-        ~guard()
-        {
-            if (!is_dummy())
-            {
-                this->l->unpin();
-            }
-        }
-        
+        guard();
+
+        guard(local const* local_ptr_);
+
+        ~guard();
+
         // guard::defer()
         // Stores a function so that it will be executed at some point
         // after all currently pinned threads are unpinned.
@@ -63,19 +61,7 @@ namespace epic
         //
         // If this method is called from a dummy guard produced by a call
         // to epic::unprotected(), the function is executed immediately.
-        auto defer(std::function<void()>&& f) const -> void
-        {
-            if (is_dummy())
-            {
-                // immediately invoke the deferred function for dummy guards
-                f();
-            }
-            else
-            {
-                // otherwise, add to the thread-local cache
-                this->l->defer(std::move(deferred{std::move(f)}), *this);
-            }
-        }
+        auto defer(std::function<void()>&& f) -> void;
 
         // guard::defer_destroy()
         // Stores a destructor for an object so that it can be deallocated
@@ -93,14 +79,7 @@ namespace epic
         // the epoch-based garbage collection scheme makes an effort to ensure
         // that it does reasonably soon.
         template <typename T>
-        auto defer_destroy(shared<T>&& ptr) const -> void
-        {
-            // calling shared::into_owned() on the given `shared` instance
-            // returns an `owned<T>`, which, immediately after it is produced,
-            // falls out of scope and is cleaned up by its destructor
-            // (recall that `shared<T>` does not destroy pointee on destruction)
-            defer([ptr = std::move(ptr)](){ ptr.into_owned(); });
-        }
+        auto defer_destroy(shared<T>&& ptr) const -> void;
 
         // guard::flush()
         // Clears the thread-local cache of functions by executing them
@@ -114,13 +93,7 @@ namespace epic
         //
         // If this method is called from a dummy guard produced by epic::unprotected(),
         // it is a no-op.
-        auto flush() -> void
-        {
-            if (!is_dummy())
-            {
-                this->l->flush(*this);
-            }
-        }
+        auto flush() -> void;
 
         // guard::repin()
         // Unpins and then immediately repins the thread.
@@ -133,13 +106,7 @@ namespace epic
         //
         // If this method is called from a dummy guard produced by epic::unprotected(),
         // then this method is a no-op. 
-        auto repin() -> void
-        {
-            if (!is_dummy())
-            {
-                this->l->repin();
-            }
-        }
+        auto repin() -> void;
 
         // guard::repin_after()
         // Temporarily unpins the thread, executes the given function,
@@ -153,62 +120,29 @@ namespace epic
         // If this method is called from a dummy guard produced by epic::unprotected(),
         // this the passed function is called directly without unpinning the thread.
         template <typename R>
-        auto repin_after(std::function<R()>&& f) -> R
-        {
-            if (!is_dummy())
-            {
-                this->l->acquire_handle();
-                this->l->unpin();
-            }
-
-            // TODO: need a scope guard here to repin and release handle
-            // this->l->pin();
-            // this->l->release_handle();
-
-            return f();
-        } 
-
-        // guard::get_collector()
-        // Returns the `collector` instance associated with this guard.
-        auto get_collector() -> nullable_ref<collector>
-        {
-            return is_dummy() 
-                ? nullable_ref<collector>{} 
-                : nullable_ref<collector>{&this->l->get_collector()};
-        }
+        auto repin_after(std::function<R()>&& f) -> R;
 
         // guard::is_dummy()
         // Determines if this is a dummy `guard` created by a call to epic::unprotected(). 
-        auto is_dummy() const noexcept -> bool
-        {
-            return nullptr == this->l;
-        }
+        auto is_dummy() const noexcept -> bool;
 
-        friend auto epic::unprotected() -> guard&;
-
-    private:
-        guard() : l{nullptr} {}
-        guard(local const* l_) : l{l_} {}
+        // guard::unprotected()
+        // Returns a reference to a dummy guard that allows
+        // unprotected access to `atomic`s.
+        //
+        // This guard should be used under special conditions only;
+        // it does not actually keep any thread pinned - it is just
+        // a fake guard that allows loading from `atomic`s unsafely.
+        //
+        // Calling guard::defer() on a dummy guard does not actually
+        // defer the function call, it is invoked immediately.
+        //
+        // The most common use of this function is to produce a dummy
+        // guard that is used for constructed or destructing a data structure.
+        static auto unprotected() -> guard;
     };
 
-    // epic::unprotected()
-    // Returns a reference to a dummy guard that allows
-    // unprotected access to `atomic`s.
-    //
-    // This guard should be used under special conditions only;
-    // it does not actually keep any thread pinned - it is just
-    // a fake guard that allows loading from `atomic`s unsafely.
-    //
-    // Calling guard::defer() on a dummy guard does not actually
-    // defer the function call, it is invoked immediately.
-    //
-    // The most common use of this function is to produce a dummy
-    // guard that is used for constructed or destructing a data structure.
-    auto unprotected() -> guard&
-    {
-        auto g = guard{};
-        return g;
-    }
+
 }
 
 #endif // EPIC_GUARD_H

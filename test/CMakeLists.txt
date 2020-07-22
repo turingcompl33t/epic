@@ -15,7 +15,7 @@ set(TEST_SUITE_SRC
     "epoch.cpp"
     "nullable_ref.cpp"
     "ordering.cpp"
-    #"owned.cpp"
+    "owned.cpp"
     "pointer.cpp"
     "shared.cpp")
 

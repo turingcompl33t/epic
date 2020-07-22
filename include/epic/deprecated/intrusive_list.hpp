@@ -94,10 +94,10 @@ namespace epic
         ~intrusive_list()
         {
             // grab a reference to the dummy guard
-            auto& g = unprotected();
+            auto g = guard::unprotected();
             
             // loading the `atomic` head produces a `shared` for list_entry
-            auto current = this->head.load(std::memory_order_relaxed, guard);
+            auto current = head.load(std::memory_order_relaxed, g);
 
             // TODO: would like to handle this with a std::optional<T&> from
             // within epic::shared<T>, but obviously we can't do that yet
@@ -105,7 +105,7 @@ namespace epic
             {
                 auto successor = current->next.load(std::memory_order_relaxed, g);
                 // Verify that all elements have been removed from the list
-                assert(success.tag() == 1);
+                assert(successor.tag() == 1);
 
                 // TODO: finalize()
 
@@ -135,7 +135,7 @@ namespace epic
         auto insert(shared<T>&& container, guard& g) -> void
         {
             // Insert right after head i.e. at beginning of list.
-            auto& = this->head;
+            // auto& = this->head;
 
             // TODO
             // Get the intrusively stored list_entry of the new element to insert.

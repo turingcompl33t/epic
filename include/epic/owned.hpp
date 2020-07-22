@@ -31,8 +31,12 @@ namespace epic
 
         ~owned()
         {
-            auto const [r, t] = decompose_tag<T>(this->data);
-            pointable<T>::drop(r);
+            // don't attempt to decompose and deref a nullptr
+            if (0 != data)
+            {
+                auto const [r, t] = decompose_tag<T>(this->data);
+                pointable<T>::drop(r);
+            }
         }
 
         // The type owned<T> is non-copyable; in order to make a 
@@ -40,8 +44,22 @@ namespace epic
         owned(owned const&)            = delete;
         owned& operator=(owned const&) = delete;
 
-        owned(owned&&)            = delete;
-        owned& operator=(owned&&) = delete;
+        owned(owned&& o) 
+            : data{o.data} 
+        {
+            o.data = 0;
+        }
+
+        owned& operator=(owned&& o)
+        {
+            if (&o != this)
+            {
+                data   = o.data;
+                o.data = 0;
+            }
+
+            return *this;
+        }
 
         // owned::make()
         // Construct the specified type on the heap and returns a new owned pointer to it.
