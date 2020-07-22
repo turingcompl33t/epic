@@ -17,6 +17,7 @@ set(TEST_SUITE_SRC
     "ordering.cpp"
     "owned.cpp"
     "pointer.cpp"
+    "scope_guard.cpp"
     "shared.cpp")
 
 add_executable(epic-test ${TEST_SUITE_SRC})

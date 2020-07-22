@@ -2,6 +2,7 @@
 
 #include <epic/guard.hpp>
 #include <epic/local.hpp>
+#include <epic/scope_guard.hpp>
 
 namespace epic
 {
@@ -67,9 +68,13 @@ namespace epic
             local_ptr->unpin();
         }
 
-        // TODO: need a scope guard here to repin and release handle
-        // this->l->pin();
-        // this->l->release_handle();
+        // Require a scope guard here to repin and release handle
+        // to handle the event in which the provided function throws.
+        scope_guard sg{[=]()
+        { 
+            local_ptr->pin();
+            local_ptr->release_handle();
+        }};
 
         return f();
     } 
