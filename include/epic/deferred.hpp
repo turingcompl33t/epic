@@ -40,6 +40,13 @@ namespace epic
         {
             fn();
         }
+
+        // deferred::swap()
+        // Swap the wrapped function with the contents of another wrapper.
+        auto swap(deferred& rhs) -> void
+        {
+            std::swap(fn, rhs.fn);
+        }
     };
 }
 

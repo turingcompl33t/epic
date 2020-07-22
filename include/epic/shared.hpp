@@ -114,12 +114,12 @@ namespace epic
             {
                 // The instance currently contains an invalid pointer;
                 // return an invalid reference.
-                return nullable_ref{};
+                return nullable_ref<T>{};
             }
             else
             {
                 // Return a valid reference to the shared data.
-                return nullable_ref{this->as_raw()};
+                return nullable_ref<T>{this->as_raw()};
             }
         }
 

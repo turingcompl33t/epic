@@ -8,13 +8,14 @@ target_link_libraries(catch-main PUBLIC Catch2::Catch2)
 
 set(TEST_SUITE_SRC
     #"atomic.cpp"
+    "bag.cpp"
     "base.cpp"
     "cell.cpp"
+    "deferred.cpp"
     "epoch.cpp"
-    #"internal.cpp"
     "nullable_ref.cpp"
     "ordering.cpp"
-    "owned.cpp"
+    #"owned.cpp"
     "pointer.cpp"
     "shared.cpp")
 

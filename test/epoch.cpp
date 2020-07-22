@@ -8,9 +8,9 @@ TEST_CASE("epic::epoch")
 {
     using namespace epic;
 
-    SECTION("can be initialized to the starting epoch with starting()")
+    SECTION("can be initialized to the starting epoch with default constructor")
     {
-        auto e = epoch::starting();
+        auto e = epoch{};
         REQUIRE(e.get() == 0);
     }
 
@@ -22,7 +22,7 @@ TEST_CASE("epic::epoch")
 
     SECTION("supports pinned() and unpinned() operations")
     {
-        auto e = epoch::starting();
+        auto e = epoch{};
         REQUIRE_FALSE(e.is_pinned());
 
         auto p = e.pinned();
@@ -40,7 +40,7 @@ TEST_CASE("epic::epoch")
         REQUIRE(e2.get() == 0);
 
         auto e3 = epoch::with_value(2);
-        auto e4 = epoch::starting();
+        auto e4 = epoch{};
 
         // compute the number of epochs e3 is ahead of e4
         auto r = e3.wrapping_sub(e4);
@@ -57,8 +57,8 @@ TEST_CASE("epic::atomic_epoch")
 
     SECTION("can be created from an existing epoch")
     {
-        auto e = epoch::starting();
-        auto a = atomic_epoch::make(e);
+        auto e = epoch{};
+        auto a = atomic_epoch{e};
 
         auto l = a.load(std::memory_order_acquire);
         REQUIRE(l.get() == 0);
@@ -66,8 +66,8 @@ TEST_CASE("epic::atomic_epoch")
 
     SECTION("supports store() operations from an existing epoch")
     {
-        auto e = epoch::starting();
-        auto a = atomic_epoch::make(e);
+        auto e = epoch{};
+        auto a = atomic_epoch{e};
 
         auto s = epoch::with_value(128);
         a.store(s, std::memory_order_release);

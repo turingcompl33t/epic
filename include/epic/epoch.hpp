@@ -26,7 +26,8 @@ namespace epic
         usize_t data;
 
     public:
-
+        epoch() : data{} {}
+        
         epoch(epoch const& e) : data{e.data} {}
 
         epoch& operator=(epoch const& e)
@@ -46,13 +47,6 @@ namespace epic
             }
 
             return *this;
-        }
-
-        // epoch::starting()
-        // Returns the starting epoch in the unpinned state.
-        static auto starting() -> epoch
-        {
-            return epoch{};
         }
 
         // epoch::with_value()
@@ -112,7 +106,6 @@ namespace epic
         }
 
     private:
-        epoch() : data{0} {}
         epoch(usize_t init) : data{init} {}
     };
 
@@ -124,6 +117,9 @@ namespace epic
         atomic_usize_t data;
     
     public:
+        atomic_epoch(epoch const& e) 
+            : data{e.get()} {}
+
         atomic_epoch(atomic_epoch const&)            = delete;
         atomic_epoch& operator=(atomic_epoch const&) = delete;
 
@@ -140,13 +136,6 @@ namespace epic
             }
 
             return *this;
-        }
-
-        // atomic_epoch::make()
-        // Create a new atomic epoch.
-        __always_inline static auto make(epoch const& e) -> atomic_epoch
-        {
-            return atomic_epoch{ e.get() };
         }
 
         // atomic_epoch::load()
@@ -184,9 +173,6 @@ namespace epic
 
             return epoch::with_value(prev);
         }
-
-    private:
-        atomic_epoch(usize_t init) : data{init} {}
     };
 }
 

@@ -8,6 +8,7 @@
 #include <cassert>
 
 #include "base.hpp"
+#include "guard.hpp"
 
 namespace epic
 {
