@@ -8,7 +8,7 @@ namespace epic
 {
     guard::guard() : local_ptr{nullptr} {}
 
-    guard::guard(local const* local_ptr_) 
+    guard::guard(local* local_ptr_) 
         : local_ptr{local_ptr_} {}
 
     guard::~guard()

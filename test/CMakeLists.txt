@@ -13,6 +13,7 @@ set(TEST_SUITE_SRC
     "cell.cpp"
     "deferred.cpp"
     "epoch.cpp"
+    "guard.cpp"
     "nullable_ref.cpp"
     "ordering.cpp"
     "owned.cpp"

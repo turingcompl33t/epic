@@ -33,7 +33,7 @@ namespace epic
     // `guard` falls out of scope.
     class guard
     {
-          local const* local_ptr;
+          local* local_ptr;
         
     public:
         // The default constructor has the same effect as guard::unprotected.
@@ -41,7 +41,7 @@ namespace epic
 
         // The constructor that accepts a valid pointer to a `local` produces
         // a guard that is capable of keeping the calling thread pinned.
-        guard(local const* local_ptr_);
+        guard(local* local_ptr_);
 
         // If the guard is not a dummy guard produced by guard::unprotected,
         // the destructor for a `guard` unpins the thread that it has pinned.

@@ -15,22 +15,24 @@ namespace epic
     // A handle to a garbage collector instance.
     class local_handle
     {
-        local const* local_ptr;
+        local* local_ptr;
 
     public:
-        local_handle(local* local_ptr_) 
-            : local_ptr{local_ptr_} {}
-
+        local_handle(local* local_ptr_);
+        
+        // The destructor for a `local_handle` releases a
+        // handle to the associated `local` instance in the 
+        // global list of `local`s maintained by the collector.
         ~local_handle();
 
         // local_handle::pin()
-        __always_inline auto pin() const -> guard;
+        auto pin() const -> guard;
 
         // local_handle::is_pinned()
-        __always_inline auto is_pinned() const -> bool;
+        auto is_pinned() const -> bool;
 
         // local_handle::collector()
-        __always_inline auto get_collector() const -> collector&;
+        auto get_collector() const -> collector const&;
     };
 }
 

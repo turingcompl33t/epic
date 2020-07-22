@@ -14,7 +14,12 @@ add_subdirectory(deps/lowlock)
 add_subdirectory(deps/expected)
 
 set(${PROJECT_NAME}_SRC
+    "src/bag.cpp"
+    "src/collector.cpp"
+    "src/global.cpp"
     "src/guard.cpp"
+    "src/local.cpp"
+    "src/local_handle.cpp"
     "src/ordering.cpp")
 
 add_library(${PROJECT_NAME} SHARED ${${PROJECT_NAME}_SRC})

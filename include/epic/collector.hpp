@@ -5,11 +5,12 @@
 
 #include <memory>
 
-#include "global.hpp"
-
 namespace epic
 {
-    // collector
+    struct global;
+    class local_handle;
+
+    // epic::collector
     //
     // An epoch-based garbage collector instance.
     struct collector
@@ -17,38 +18,29 @@ namespace epic
         // The shared global data.
         std::shared_ptr<global> instance;
 
-        collector() 
-            : instance{std::move(std::make_shared<global>())} {}
+        collector();
 
-        collector(collector const& c) 
-            : instance{c.instance} {}
+        collector(collector const& c);
 
-        collector& operator=(collector const& c)
-        {
-            instance = c.instance;
-            return *this;
-        }
+        collector& operator=(collector const& c);
 
-        collector(collector&& c) 
-            : instance{std::move(c.instance)}
-        {}
+        collector(collector&& c);
 
-        collector& operator=(collector&& c)
-        {
-            if (&c != this)
-            {
-                instance = std::move(c.instance);
-            }
+        collector& operator=(collector&& c);
 
-            return *this;
-        }
+        // collector::register_handle()
+        // Register a new handle with the collector.
+        //
+        // Once a new `collector` instance is initialized,
+        // the `register_handle()` method is the way in which
+        // a thread registers itself for participation in
+        // garbage collection. Thus, in the non-default (thread-local)
+        // API, this is the entry point for individual threads.
+        auto register_handle() -> local_handle;
 
         // collector::release()
         // Release reference to the global shared state.
-        auto release() -> void
-        {
-            instance.reset();
-        }
+        auto release() -> void;
     };
 }
 
