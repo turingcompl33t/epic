@@ -15,6 +15,8 @@ namespace epic
     template <typename T>
     class shared;
 
+    // epic::owned<T>
+    // 
     // An owned, heap-allocated object.
     //
     // Analogous to a std::unique_ptr<T>.

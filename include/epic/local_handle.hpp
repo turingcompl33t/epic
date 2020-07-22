@@ -3,11 +3,13 @@
 #ifndef EPIC_LOCAL_HANDLE_H
 #define EPIC_LOCAL_HANDLE_H
 
-#include "local.hpp"
+#include "guard.hpp"
 #include "collector.hpp"
 
 namespace epic
 {
+    class local;
+
     // local_handle
     //
     // A handle to a garbage collector instance.
@@ -16,28 +18,19 @@ namespace epic
         local const* local_ptr;
 
     public:
-        ~local_handle()
-        {
-            local_ptr->release_handle();
-        }
+        local_handle(local* local_ptr_) 
+            : local_ptr{local_ptr_} {}
+
+        ~local_handle();
 
         // local_handle::pin()
-        __always_inline auto pin() const -> guard
-        {
-            return local_ptr->pin();
-        }
+        __always_inline auto pin() const -> guard;
 
         // local_handle::is_pinned()
-        __always_inline auto is_pinned() const -> bool
-        {
-            return local_ptr->is_pinned();
-        }
+        __always_inline auto is_pinned() const -> bool;
 
         // local_handle::collector()
-        __always_inline auto collector() const -> collector&
-        {
-            return local_ptr->collector();
-        }
+        __always_inline auto get_collector() const -> collector&;
     };
 }
 

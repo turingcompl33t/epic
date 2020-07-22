@@ -10,7 +10,7 @@ namespace epic
 {   
     class local;
 
-    // guard
+    // epic::guard
     // 
     // A guard that keeps the current thread pinned.
     //

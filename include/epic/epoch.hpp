@@ -140,7 +140,7 @@ namespace epic
 
         // atomic_epoch::load()
         // Loads a value from the atomic epoch.
-        __always_inline auto load(std::memory_order order) -> epoch
+        __always_inline auto load(std::memory_order order) const -> epoch
         {
             auto const d = std::atomic_load_explicit(&this->data, order);
             return epoch::with_value(d);

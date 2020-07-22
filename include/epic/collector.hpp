@@ -12,12 +12,11 @@ namespace epic
     // collector
     //
     // An epoch-based garbage collector instance.
-    class collector
+    struct collector
     {
         // The shared global data.
         std::shared_ptr<global> instance;
 
-    public:
         collector() 
             : instance{std::move(std::make_shared<global>())} {}
 

@@ -62,6 +62,16 @@ namespace epic
             return 0 == count;
         }
 
+        // bag::is_expired()
+        // Determines if it is safe to collect the given bag
+        // with respect to the current global epoch.
+        auto is_expired(epoch const& e) const noexcept -> bool
+        {
+            // It is a logic error to attempt collection on unsealed bag.
+            assert(sealed);
+            return e.wrapping_sub(sealed_epoch) >= 2;
+        }
+
         // bag::try_push()
         auto try_push(deferred&& def) -> std::optional<deferred>
         {
