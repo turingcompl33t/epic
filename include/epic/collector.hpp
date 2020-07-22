@@ -42,6 +42,13 @@ namespace epic
 
             return *this;
         }
+
+        // collector::release()
+        // Release reference to the global shared state.
+        auto release() -> void
+        {
+            instance.reset();
+        }
     };
 }
 

@@ -105,6 +105,16 @@ namespace epic
             return this->data;
         }
 
+        auto operator==(epoch const& e) -> bool
+        {
+            return data == e.data;
+        }
+
+        auto operator!=(epoch const& e) -> bool
+        {
+            return data != e.data;
+        }
+
     private:
         epoch(usize_t init) : data{init} {}
     };
