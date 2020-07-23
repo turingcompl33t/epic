@@ -4,6 +4,3 @@
 [submodule "deps/lowlock"]
 	path = deps/lowlock
 	url = git@github.com:turingcompl33t/lowlock.git
-[submodule "deps/expected"]
-	path = deps/expected
-	url = git@github.com:TartanLlama/expected.git
